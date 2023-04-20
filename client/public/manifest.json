@@ -1,0 +1,22 @@
+{
+  "short_name": "Tech Time",
+  "name": "Tech Time - The Tech Courses You Need, When You Need It",
+  "icons": [
+    {
+      "src": "techtime.png",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "techtime.png",
+      "type": "image/png"
+    },
+    {
+      "src": "techtime.png",
+      "type": "image/png"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
+}
