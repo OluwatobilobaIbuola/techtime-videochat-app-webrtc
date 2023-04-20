@@ -1,5 +1,5 @@
-import React, { useContext, useRef } from "react";
-import { camera, mic, phone } from "../assests/icons";
+import { useContext, useRef } from "react";
+import { camera, mic, phone } from "../assets/icons";
 import { SocketContext } from "../context/context";
 
 export default function Controls() {
@@ -41,32 +41,34 @@ export default function Controls() {
       <div
         ref={cameraRef}
         className="camera-btn bg-primary p-[20px] rounded-[50%] flex justify-center items-center cursor-pointer"
+        onClick={toggleCamera}
       >
         <img
+          alt="camera"
           src={camera}
           className="w-[20px] h-[20px] ss:w-[30px] ss:h-[30px]"
-          onClick={toggleCamera}
         />
       </div>
 
       <div
         ref={micRef}
         className="mic-btn bg-primary p-[20px] rounded-[50%] flex justify-center items-center cursor-pointer"
+        onClick={toggleMic}
       >
         <img
+          alt="mic"
           src={mic}
           className="w-[20px] h-[20px] ss:w-[30px] ss:h-[30px]"
-          onClick={toggleMic}
         />
       </div>
-
       <div
         className="bg-red-400 p-[20px] rounded-[50%] flex justify-center items-center cursor-pointer"
         id="leave-btn"
+        onClick={leaveCall}
       >
         <img
+          alt="phone"
           src={phone}
-          onClick={leaveCall}
           className="w-[20px] h-[20px] ss:w-[30px] ss:h-[30px]"
         />
       </div>

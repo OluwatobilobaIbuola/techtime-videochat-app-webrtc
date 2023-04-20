@@ -1,8 +1,5 @@
-import Peer from "simple-peer";
-import { Socket } from "socket.io-client";
-
 export interface Call {
-  isReceivingCall: boolean;
+  isConnectingCall: boolean;
   from: string;
   name: string;
   signal: any;
@@ -15,12 +12,12 @@ export interface Msg {
 }
 
 type ReceiveMsgString = string;
-
 export interface ServerToClientEvents {
   me: (id: string) => void;
   callUser: (object: Omit<Call, "isReceivingCall" | "userToCall">) => void;
   callAccepted: (signal: any) => void;
   receiveMsg: (string: ReceiveMsgString) => void;
+  callEnded: () => void;
 }
 
 export interface ClientToServerEvents {
@@ -35,7 +32,7 @@ export interface SocketValueContextType {
   stream: MediaStream | undefined;
   name: string;
   setName(value: string): void;
-  call: Omit<Call, "userToCall">;
+  call: any;
   myVideo: React.RefObject<HTMLVideoElement>;
   userVideo: React.RefObject<HTMLVideoElement>;
   me: string;
@@ -44,5 +41,5 @@ export interface SocketValueContextType {
   callUser(id: string): void;
   leaveCall(): void;
   answerCall(): void;
-  socket: Socket<ServerToClientEvents, ClientToServerEvents>;
+  socket: any;
 }

@@ -1,5 +1,5 @@
 export interface Call {
-  isReceivingCall: boolean;
+  isConnectingCall: boolean;
   from: string;
   name: string;
   signal: any;
