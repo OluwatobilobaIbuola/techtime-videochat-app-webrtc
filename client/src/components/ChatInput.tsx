@@ -1,4 +1,4 @@
-import React, { FormEvent, useContext } from "react";
+import React, { FormEvent } from "react";
 import { BsEmojiSmileFill } from "react-icons/bs";
 import { IoMdSend } from "react-icons/io";
 
@@ -19,21 +19,17 @@ export default function ChatInput({ handleSendMsg }: any) {
         </div>
       </div>
       <form
-        className="rounded-[32px] bg-white flex items-center"
+        className="rounded-[32px] px-2 bg-white flex items-center overflow-auto chat__container"
         onSubmit={(event: FormEvent<HTMLFormElement>) => sendChat(event)}
       >
-        <input
-          type="text"
+        <textarea
           placeholder="type your message here"
           onChange={(e) => setMsg(e.target.value)}
           value={msg}
-          className="flex-1 h-[60%] rounded-[32px] bg-transparent text-black pl-4 text-[18px] py-2 focus:outline-none"
+          className="flex-1 h-[48px] rounded-[32px] bg-transparent text-black px-4 text-[18px] py-2 focus:outline-none"
         />
-        <button
-          type="submit"
-          className="rounded-[8px] py-[0.3rem] px-[2rem] flex justify-center items-center bg-primary border-none"
-        >
-          <IoMdSend className="text-[32px] text-white" />
+        <button type="submit" className="">
+          <IoMdSend className="text-[20px] text-primary" />
         </button>
       </form>
     </div>

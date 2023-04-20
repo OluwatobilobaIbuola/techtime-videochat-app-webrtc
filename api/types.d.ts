@@ -1,5 +1,5 @@
 export interface Call {
-  isReceivingCall: boolean;
+  isConnectingCall: boolean;
   from: string;
   name: string;
   signal: any;
@@ -12,17 +12,3 @@ export interface Msg {
 }
 
 type ReceiveMsgString = string;
-
-export interface ServerToClientEvents {
-  me: (id: string) => void;
-  callUser: (object: Omit<Call, "isReceivingCall" | "userToCall">) => void;
-  callAccepted: (signal: any) => void;
-  receiveMsg: (string: ReceiveMsgString) => void;
-  callEnded: () => void;
-}
-
-export interface ClientToServerEvents {
-  answerCall: (object: { signal: any; to: string }) => void;
-  callUser: (object: Omit<Call, "isReceivingCall">) => void;
-  sendMsg: (object: Msg) => void;
-}

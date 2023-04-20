@@ -1,19 +1,12 @@
 import React, { createContext, useState, useRef, useEffect } from "react";
-import {
-  Call,
-  ClientToServerEvents,
-  ServerToClientEvents,
-  SocketValueContextType,
-} from "../types";
-import { io, Socket } from "socket.io-client";
+import { Call, SocketValueContextType } from "../types";
+import { io } from "socket.io-client";
 import Peer from "simple-peer";
 import { BASE_URL } from "../services/apiUrls";
 
 export const SocketContext = createContext({} as SocketValueContextType);
 
-const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(
-  BASE_URL!
-);
+const socket = io(BASE_URL!);
 export const SocketContextProvider = ({
   children,
 }: {
@@ -23,7 +16,7 @@ export const SocketContextProvider = ({
   const [callEnded, setCallEnded] = useState(false);
   const [stream, setStream] = useState<MediaStream | undefined>();
   const [name, setName] = useState("");
-  const [call, setCall] = useState({} as Omit<Call, "userToCall">);
+  const [call, setCall] = useState({} as any);
   const [me, setMe] = useState("");
   const [idToCall, setIdToCall] = useState("");
 
@@ -42,10 +35,9 @@ export const SocketContextProvider = ({
     socket.on("me", (id) => {
       setMe(id);
     });
-
-    socket.on("callUser", ({ signal, from, name: callerName }) => {
+    socket.on("callUserConnection", ({ signal, from, name: callerName }) => {
       setCall({
-        isReceivingCall: true,
+        isConnectingCall: true,
         from,
         name: callerName,
         signal,
@@ -60,7 +52,7 @@ export const SocketContextProvider = ({
       stream: stream!,
     });
     peer.on("signal", (data) => {
-      socket.emit("answerCall", { signal: data, to: call.from });
+      socket.emit("answerCall", { signal: data, to: call.from, from: me });
     });
     peer.on("stream", (currentStream) => {
       if (userVideo.current) userVideo.current.srcObject = currentStream;
@@ -82,7 +74,8 @@ export const SocketContextProvider = ({
     peer.on("stream", (currentStream) => {
       if (userVideo.current) userVideo.current.srcObject = currentStream;
     });
-    socket.on("callAccepted", (signal) => {
+
+    socket.on("callUserConnection", ({ signal }) => {
       setCallAccepted(true);
       peer.signal(signal);
     });
@@ -91,6 +84,7 @@ export const SocketContextProvider = ({
 
   const leaveCall = () => {
     setCallEnded(true);
+    setCallAccepted(false);
     if (connectionRef.current) connectionRef.current.destroy();
     // window.location.reload();
   };
