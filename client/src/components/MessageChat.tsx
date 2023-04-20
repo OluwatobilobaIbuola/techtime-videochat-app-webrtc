@@ -27,7 +27,7 @@ export default function MessageChat() {
     socket.on("receiveMsg", (msg: string) => {
       setArrivalMessage({ fromSelf: false, message: msg });
     });
-  }, []);
+  }, [socket]);
 
   useEffect(() => {
     outGoingMessage && setMessages((prev) => [...prev, outGoingMessage]);

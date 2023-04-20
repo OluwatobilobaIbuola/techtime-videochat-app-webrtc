@@ -1,11 +1,9 @@
-import React, { useContext } from "react";
+import { useContext } from "react";
 import { SocketContext } from "../context/context";
 import CopyToClipboard from "react-copy-to-clipboard";
 import { phone } from "../assets/icons";
 
-type Props = {};
-
-export default function Lobby({}: Props) {
+export default function Lobby() {
   const {
     name,
     callAccepted,
@@ -60,6 +58,7 @@ export default function Lobby({}: Props) {
             id="leave-btn"
           >
             <img
+              alt="phone"
               src={phone}
               className="w-[20px] h-[20px] ss:w-[30px] ss:h-[30px]"
               onClick={answerCall}
