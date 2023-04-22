@@ -46,9 +46,6 @@ const io = new socket_io_1.Server(server, {
 });
 io.on("connection", (socket) => {
     socket.emit("me", socket.id);
-    socket.on("disconnect", () => {
-        socket.broadcast.emit("callEnded");
-    });
     socket.on("callUser", (data) => {
         io.to(data.userToCall).emit("userConnectionDetails", {
             signal: data.signal,
@@ -68,8 +65,8 @@ io.on("connection", (socket) => {
     socket.on("sendMsg", (data) => {
         io.to(data.to).emit("receiveMsg", data.msg);
     });
-    socket.on("close", (data) => {
-        io.to(data.to).emit("close");
+    socket.on("close", () => {
+        socket.broadcast.emit("callEnded");
     });
 });
 //# sourceMappingURL=server.js.map
