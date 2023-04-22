@@ -16,6 +16,7 @@ export default function Lobby() {
     idToCall,
   } = useContext(SocketContext);
   const [isCopied, setIsCopied] = useState(false);
+  const [isCalling, setIsCalling] = useState(false);
   return (
     <div className="fixed bottom-0 top-0 left-0 right-0 z-[999] flex items-center justify-center bg-black">
       <div className="w-full max-w-[400px] flex flex-col gap-2">
@@ -37,9 +38,12 @@ export default function Lobby() {
 
           <button
             className="bg-primary text-white text-[14px] font-[500] px-2 w-[98px] absolute right-0 top-0 bottom-0"
-            onClick={() => callUser(idToCall)}
+            onClick={() => {
+              callUser(idToCall);
+              setIsCalling(true);
+            }}
           >
-            Call
+            {isCalling ? "Calling" : "Call"}
           </button>
         </div>
         <CopyToClipboard text={me}>

@@ -29,7 +29,9 @@ export const SocketContextProvider = ({
       .getUserMedia({ video: true, audio: true })
       .then((currentStream) => {
         setStream(currentStream);
-        if (myVideo.current) myVideo.current.srcObject = currentStream;
+        if (myVideo.current) {
+          myVideo.current.srcObject = currentStream;
+        }
       });
     socket.on("me", (id) => {
       setMe(id);
@@ -45,7 +47,7 @@ export const SocketContextProvider = ({
         });
       }
     );
-    socket.on("close", () => {
+    socket.on("callEnded", () => {
       setCallEnded(true);
       setCallAccepted(false);
       setCall({
@@ -54,21 +56,19 @@ export const SocketContextProvider = ({
         name: "",
         signal: "",
       });
-      // if (connectionRef.current) connectionRef.current.destroy();
       window.location.reload();
     });
     if (connectionRef.current) {
       connectionRef.current.on("close", () => {
+        socket.emit("close");
         setCallAccepted(false);
         setCallEnded(true);
-        socket.emit("close", { to: call.from });
         setCall({
           isReceivingCall: false,
           from: "",
           name: "",
           signal: "",
         });
-        // if (connectionRef.current) connectionRef.current.destroy();
         window.location.reload();
       });
     }
@@ -90,6 +90,7 @@ export const SocketContextProvider = ({
   };
 
   const callUser = (id: string) => {
+    if (id === "") return;
     connectionRef.current = new Peer({
       initiator: true,
       trickle: false,
@@ -113,19 +114,19 @@ export const SocketContextProvider = ({
   };
 
   const leaveCall = () => {
+    socket.emit("close");
+    setCallEnded(true);
+    setCallAccepted(false);
+    setCall({
+      isReceivingCall: false,
+      from: "",
+      name: "",
+      signal: "",
+    });
     if (connectionRef.current) {
-      socket.emit("close", { to: call.from });
-      setCallEnded(true);
-      setCallAccepted(false);
-      setCall({
-        isReceivingCall: false,
-        from: "",
-        name: "",
-        signal: "",
-      });
-      window.location.reload();
-      // if (connectionRef.current) connectionRef.current.destroy();
+      connectionRef.current.removeStream(stream!);
     }
+    window.location.reload();
   };
 
   return (
