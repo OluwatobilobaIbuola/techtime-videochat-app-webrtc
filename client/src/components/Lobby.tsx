@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { SocketContext } from "../context/context";
 import CopyToClipboard from "react-copy-to-clipboard";
 import { phone } from "../assets/icons";
@@ -15,6 +15,7 @@ export default function Lobby() {
     setIdToCall,
     idToCall,
   } = useContext(SocketContext);
+  const [isCopied, setIsCopied] = useState(false);
   return (
     <div className="fixed bottom-0 top-0 left-0 right-0 z-[999] flex items-center justify-center bg-black">
       <div className="w-full max-w-[400px] flex flex-col gap-2">
@@ -42,12 +43,15 @@ export default function Lobby() {
           </button>
         </div>
         <CopyToClipboard text={me}>
-          <button className="bg-primary h-[46px]  rounded-[2px] text-white text-[14px] font-[500] px-2 w-full ">
-            Copy Connection ID
+          <button
+            onClick={() => setIsCopied(true)}
+            className="bg-primary h-[46px]  rounded-[2px] text-white text-[14px] font-[500] px-2 w-full "
+          >
+            {isCopied ? "Copied" : "Copy Connection ID"}
           </button>
         </CopyToClipboard>
       </div>
-      {call.isConnectingCall && !callAccepted ? (
+      {call.isReceivingCall && !callAccepted ? (
         <div
           className="absolute py-4 px-8 rounded-[8px] bg-white text-black right-[20px] flex flex-col items-center
           justify-center gap-8 top-[20px] h-[300px]"

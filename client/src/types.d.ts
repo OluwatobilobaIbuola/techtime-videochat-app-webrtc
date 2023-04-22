@@ -1,5 +1,5 @@
 export interface Call {
-  isConnectingCall: boolean;
+  isReceivingCall: boolean;
   from: string;
   name: string;
   signal: any;
@@ -32,7 +32,7 @@ export interface SocketValueContextType {
   stream: MediaStream | undefined;
   name: string;
   setName(value: string): void;
-  call: any;
+  call: Omit<Call, "userToCall">;
   myVideo: React.RefObject<HTMLVideoElement>;
   userVideo: React.RefObject<HTMLVideoElement>;
   me: string;
