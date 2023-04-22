@@ -6,6 +6,8 @@ export default function VideoChat() {
   const { callAccepted, myVideo, userVideo, callEnded, stream } =
     useContext(SocketContext);
 
+  console.log("callEnded", callEnded);
+
   return (
     <div className="h-full relative flex-[75%]">
       {stream && (
@@ -16,7 +18,9 @@ export default function VideoChat() {
           autoPlay
           className={`${
             callAccepted &&
-            "fixed top-[20px] left-[20px] ss:h-[170px] ss:w-[300px] h-[80px] w-[120px] rounded-[5px] border-[2px] border-primary z-[999] shadow-[3px_3px_15px_-1px_rgba(0,0,0,0.77)]"
+            !callEnded &&
+            `fixed top-[20px] left-[20px] ss:h-[170px] ss:w-[300px] h-[80px] w-[120px]
+             rounded-[5px] border-[2px] border-primary z-[999] shadow-[3px_3px_15px_-1px_rgba(0,0,0,0.77)]`
           } bg-black w-full h-full object-cover`}
         />
       )}

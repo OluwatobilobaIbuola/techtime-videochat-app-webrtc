@@ -56,7 +56,7 @@ export default function MessageChat() {
                       message?.fromSelf
                         ? "bg-gray-200"
                         : "bg-gray-600 text-white"
-                    } max-w-[40%] break-words py-2 px-4 text-[1rem] rounded-[16px]`}
+                    } max-w-[60%] break-words py-2 px-4 text-[1rem] rounded-[16px]`}
                   >
                     <p>{message?.message}</p>
                   </div>

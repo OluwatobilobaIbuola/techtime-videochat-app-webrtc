@@ -16,7 +16,7 @@ export const SocketContextProvider = ({
   const [callEnded, setCallEnded] = useState(false);
   const [stream, setStream] = useState<MediaStream | undefined>();
   const [name, setName] = useState("");
-  const [call, setCall] = useState({} as any);
+  const [call, setCall] = useState({} as Omit<Call, "userToCall">);
   const [me, setMe] = useState("");
   const [idToCall, setIdToCall] = useState("");
 
@@ -31,39 +31,71 @@ export const SocketContextProvider = ({
         setStream(currentStream);
         if (myVideo.current) myVideo.current.srcObject = currentStream;
       });
-
     socket.on("me", (id) => {
       setMe(id);
     });
-    socket.on("callUserConnection", ({ signal, from, name: callerName }) => {
+    socket.on(
+      "userConnectionDetails",
+      ({ signal, from, name: callerName, isReceivingCall }) => {
+        setCall({
+          isReceivingCall: isReceivingCall,
+          from,
+          name: callerName,
+          signal,
+        });
+      }
+    );
+    socket.on("close", () => {
+      setCallEnded(true);
+      setCallAccepted(false);
       setCall({
-        isConnectingCall: true,
-        from,
-        name: callerName,
-        signal,
+        isReceivingCall: false,
+        from: "",
+        name: "",
+        signal: "",
       });
+      // if (connectionRef.current) connectionRef.current.destroy();
+      window.location.reload();
     });
+    if (connectionRef.current) {
+      connectionRef.current.on("close", () => {
+        setCallAccepted(false);
+        setCallEnded(true);
+        socket.emit("close", { to: call.from });
+        setCall({
+          isReceivingCall: false,
+          from: "",
+          name: "",
+          signal: "",
+        });
+        // if (connectionRef.current) connectionRef.current.destroy();
+        window.location.reload();
+      });
+    }
   }, []);
   const answerCall = () => {
-    setCallAccepted(true);
-    const peer = new Peer({
+    connectionRef.current = new Peer({
       initiator: false,
       trickle: false,
       stream: stream!,
     });
-    peer.on("signal", (data) => {
+    connectionRef.current.on("signal", (data) => {
       socket.emit("answerCall", { signal: data, to: call.from, from: me });
     });
-    peer.on("stream", (currentStream) => {
+    connectionRef.current.signal(call.signal);
+    connectionRef.current.on("stream", (currentStream) => {
       if (userVideo.current) userVideo.current.srcObject = currentStream;
     });
-    peer.signal(call.signal);
-    connectionRef.current = peer;
+    setCallAccepted(true);
   };
 
   const callUser = (id: string) => {
-    const peer = new Peer({ initiator: true, trickle: false, stream: stream! });
-    peer.on("signal", (data) => {
+    connectionRef.current = new Peer({
+      initiator: true,
+      trickle: false,
+      stream: stream!,
+    });
+    connectionRef.current.on("signal", (data) => {
       socket.emit("callUser", {
         userToCall: id,
         signal: data,
@@ -71,22 +103,29 @@ export const SocketContextProvider = ({
         name,
       });
     });
-    peer.on("stream", (currentStream) => {
+    socket.on("userConnectionDetails", ({ signal }) => {
+      if (connectionRef.current) connectionRef.current.signal(signal);
+      setCallAccepted(true);
+    });
+    connectionRef.current.on("stream", (currentStream) => {
       if (userVideo.current) userVideo.current.srcObject = currentStream;
     });
-
-    socket.on("callUserConnection", ({ signal }) => {
-      setCallAccepted(true);
-      peer.signal(signal);
-    });
-    connectionRef.current = peer;
   };
 
   const leaveCall = () => {
-    setCallEnded(true);
-    setCallAccepted(false);
-    if (connectionRef.current) connectionRef.current.destroy();
-    // window.location.reload();
+    if (connectionRef.current) {
+      socket.emit("close", { to: call.from });
+      setCallEnded(true);
+      setCallAccepted(false);
+      setCall({
+        isReceivingCall: false,
+        from: "",
+        name: "",
+        signal: "",
+      });
+      window.location.reload();
+      // if (connectionRef.current) connectionRef.current.destroy();
+    }
   };
 
   return (

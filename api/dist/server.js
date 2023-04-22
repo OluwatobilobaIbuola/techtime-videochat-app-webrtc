@@ -50,21 +50,26 @@ io.on("connection", (socket) => {
         socket.broadcast.emit("callEnded");
     });
     socket.on("callUser", (data) => {
-        io.to(data.userToCall).emit("callUserConnection", {
+        io.to(data.userToCall).emit("userConnectionDetails", {
             signal: data.signal,
             from: data.from,
             name: data.name,
+            isReceivingCall: true,
         });
     });
     socket.on("answerCall", (data) => {
-        io.to(data.to).emit("callUserConnection", {
+        io.to(data.to).emit("userConnectionDetails", {
             signal: data.signal,
             from: data.from,
             name: "",
+            isReceivingCall: false,
         });
     });
     socket.on("sendMsg", (data) => {
         io.to(data.to).emit("receiveMsg", data.msg);
+    });
+    socket.on("close", (data) => {
+        io.to(data.to).emit("close");
     });
 });
 //# sourceMappingURL=server.js.map
