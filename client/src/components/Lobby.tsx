@@ -2,21 +2,17 @@ import { useContext, useState } from "react";
 import { SocketContext } from "../context/context";
 import CopyToClipboard from "react-copy-to-clipboard";
 import { phone } from "../assets/icons";
+import useCallUserHook from "../Hooks/useCallUserHook";
+import useAnswerUserHook from "../Hooks/useAnswerUserHook";
 
 export default function Lobby() {
-  const {
-    name,
-    callAccepted,
-    setName,
-    call,
-    callUser,
-    answerCall,
-    me,
-    setIdToCall,
-    idToCall,
-  } = useContext(SocketContext);
+  const { name, callAccepted, setName, call, me, setIdToCall, idToCall } =
+    useContext(SocketContext);
+  const { callUser } = useCallUserHook();
+  const { answerCall } = useAnswerUserHook();
   const [isCopied, setIsCopied] = useState(false);
   const [isCalling, setIsCalling] = useState(false);
+
   return (
     <div className="fixed bottom-0 top-0 left-0 right-0 z-[999] flex items-center justify-center bg-black">
       <div className="w-full max-w-[400px] flex flex-col gap-2">
@@ -39,11 +35,11 @@ export default function Lobby() {
           <button
             className="bg-primary text-white text-[14px] font-[500] px-2 w-[98px] absolute right-0 top-0 bottom-0"
             onClick={() => {
-              callUser(idToCall);
               setIsCalling(true);
+              callUser(idToCall);
             }}
           >
-            {isCalling ? "Calling" : "Call"}
+            {idToCall && isCalling ? "Calling" : "Call"}
           </button>
         </div>
         <CopyToClipboard text={me}>

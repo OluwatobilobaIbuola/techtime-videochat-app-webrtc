@@ -3,10 +3,13 @@ import MessageChat from "./components/MessageChat";
 import VideoChat from "./components/VideoChat";
 import { SocketContext } from "./context/context";
 import "./styles/tailwind.css";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 
 export default function App() {
-  const { callAccepted } = useContext(SocketContext);
+  const { callAccepted, leaveCall } = useContext(SocketContext);
+  useEffect(() => {
+    window.addEventListener("beforeunload", leaveCall);
+  }, []);
   return (
     <div className="overflow-x-hidden overflow-y-hidden">
       <div className="flex h-screen items-center">

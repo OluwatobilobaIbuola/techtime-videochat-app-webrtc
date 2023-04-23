@@ -1,28 +1,41 @@
-import React, { createContext, useState, useRef, useEffect } from "react";
-import { Call, SocketValueContextType } from "../types";
-import { io } from "socket.io-client";
+import React, { createContext, useState, useRef } from "react";
+import {
+  Call,
+  ClientToServerEvents,
+  ServerToClientEvents,
+  SocketValueContextType,
+} from "../types";
 import Peer from "simple-peer";
 import { BASE_URL } from "../services/apiUrls";
+import { io, Socket } from "socket.io-client";
+import { useEffect } from "react";
 
 export const SocketContext = createContext({} as SocketValueContextType);
 
-const socket = io(BASE_URL!);
+const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(
+  BASE_URL!
+);
+
 export const SocketContextProvider = ({
   children,
 }: {
   children: React.ReactNode;
 }) => {
   const [callAccepted, setCallAccepted] = useState(false);
-  const [callEnded, setCallEnded] = useState(false);
+  const [idToCall, setIdToCall] = useState("");
   const [stream, setStream] = useState<MediaStream | undefined>();
   const [name, setName] = useState("");
-  const [call, setCall] = useState({} as Omit<Call, "userToCall">);
   const [me, setMe] = useState("");
-  const [idToCall, setIdToCall] = useState("");
+  const [callEnded, setCallEnded] = useState(false);
+  const [call, setCall] = useState(
+    {} as Omit<Call, "userToCall" | "userCalling">
+  );
+
+  console.log("call", call);
 
   const myVideo = useRef<HTMLVideoElement>(null);
   const userVideo = useRef<HTMLVideoElement>(null);
-  const connectionRef = useRef<Peer.Instance>();
+  const peerRef = useRef<Peer.Instance>();
 
   useEffect(() => {
     navigator.mediaDevices
@@ -33,7 +46,7 @@ export const SocketContextProvider = ({
           myVideo.current.srcObject = currentStream;
         }
       });
-    socket.on("me", (id) => {
+    socket.on("me", (id: string) => {
       setMe(id);
     });
     socket.on(
@@ -58,8 +71,8 @@ export const SocketContextProvider = ({
       });
       window.location.reload();
     });
-    if (connectionRef.current) {
-      connectionRef.current.on("close", () => {
+    if (peerRef.current) {
+      peerRef.current.on("close", () => {
         socket.emit("close");
         setCallAccepted(false);
         setCallEnded(true);
@@ -73,46 +86,6 @@ export const SocketContextProvider = ({
       });
     }
   }, []);
-  const answerCall = () => {
-    connectionRef.current = new Peer({
-      initiator: false,
-      trickle: false,
-      stream: stream!,
-    });
-    connectionRef.current.on("signal", (data) => {
-      socket.emit("answerCall", { signal: data, to: call.from, from: me });
-    });
-    connectionRef.current.signal(call.signal);
-    connectionRef.current.on("stream", (currentStream) => {
-      if (userVideo.current) userVideo.current.srcObject = currentStream;
-    });
-    setCallAccepted(true);
-  };
-
-  const callUser = (id: string) => {
-    if (id === "") return;
-    connectionRef.current = new Peer({
-      initiator: true,
-      trickle: false,
-      stream: stream!,
-    });
-    connectionRef.current.on("signal", (data) => {
-      socket.emit("callUser", {
-        userToCall: id,
-        signal: data,
-        from: me,
-        name,
-      });
-    });
-    socket.on("userConnectionDetails", ({ signal }) => {
-      if (connectionRef.current) connectionRef.current.signal(signal);
-      setCallAccepted(true);
-    });
-    connectionRef.current.on("stream", (currentStream) => {
-      if (userVideo.current) userVideo.current.srcObject = currentStream;
-    });
-  };
-
   const leaveCall = () => {
     socket.emit("close");
     setCallEnded(true);
@@ -123,8 +96,8 @@ export const SocketContextProvider = ({
       name: "",
       signal: "",
     });
-    if (connectionRef.current) {
-      connectionRef.current.removeStream(stream!);
+    if (peerRef.current) {
+      peerRef.current.removeStream(stream!);
     }
     window.location.reload();
   };
@@ -143,10 +116,10 @@ export const SocketContextProvider = ({
         me,
         idToCall,
         setIdToCall,
-        callUser,
         leaveCall,
-        answerCall,
         socket,
+        setCallAccepted,
+        peerRef,
       }}
     >
       {children}
