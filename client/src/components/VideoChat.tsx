@@ -3,11 +3,8 @@ import { SocketContext } from "../context/context";
 import Controls from "./Controls";
 
 export default function VideoChat() {
-  const { callAccepted, myVideo, userVideo, callEnded, stream } =
+  const { callAccepted, myVideo, peerRef, userVideo, callEnded, stream } =
     useContext(SocketContext);
-
-  console.log("callEnded", callEnded);
-
   return (
     <div className="h-full relative flex-[75%]">
       {stream && (
