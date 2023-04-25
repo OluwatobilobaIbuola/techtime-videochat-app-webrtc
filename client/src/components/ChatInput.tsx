@@ -23,7 +23,7 @@ export default function ChatInput({ handleSendMsg }: any) {
         onSubmit={(event: FormEvent<HTMLFormElement>) => sendChat(event)}
       >
         <textarea
-          placeholder="type your message here"
+          placeholder="type here"
           onChange={(e) => setMsg(e.target.value)}
           value={msg}
           className="flex-1 max-h-[48px] rounded-[32px] bg-transparent text-black px-4 text-[18px] py-2 focus:outline-none"
