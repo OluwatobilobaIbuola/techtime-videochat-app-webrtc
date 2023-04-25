@@ -65,7 +65,7 @@ io.on("connection", (socket) => {
     socket.on("sendMsg", (data) => {
         io.to(data.to).emit("receiveMsg", data.msg);
     });
-    socket.on("close", () => {
+    socket.on("disconnect", () => {
         socket.broadcast.emit("callEnded");
     });
 });

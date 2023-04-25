@@ -31,8 +31,6 @@ export const SocketContextProvider = ({
     {} as Omit<Call, "userToCall" | "userCalling">
   );
 
-  console.log("call", call);
-
   const myVideo = useRef<HTMLVideoElement>(null);
   const userVideo = useRef<HTMLVideoElement>(null);
   const peerRef = useRef<Peer.Instance>();
@@ -73,7 +71,6 @@ export const SocketContextProvider = ({
     });
     if (peerRef.current) {
       peerRef.current.on("close", () => {
-        socket.emit("close");
         setCallAccepted(false);
         setCallEnded(true);
         setCall({
@@ -87,7 +84,7 @@ export const SocketContextProvider = ({
     }
   }, []);
   const leaveCall = () => {
-    socket.emit("close");
+    socket.disconnect();
     setCallEnded(true);
     setCallAccepted(false);
     setCall({
